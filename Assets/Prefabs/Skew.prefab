@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8451439203746781472}
   - component: {fileID: 8451439203746781473}
   - component: {fileID: 2128831671054088683}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Skew body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -109,7 +109,7 @@ GameObject:
   - component: {fileID: 8451439203832508141}
   - component: {fileID: 8451439203832508138}
   - component: {fileID: 7502174136761190912}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Skew body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -207,7 +207,7 @@ GameObject:
   - component: {fileID: 8451439204247135150}
   - component: {fileID: 8451439204247135151}
   - component: {fileID: 6506260351199142275}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Skew body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -305,7 +305,7 @@ GameObject:
   - component: {fileID: 8451439204680351891}
   - component: {fileID: 8451439204680351888}
   - component: {fileID: 3694961778127650379}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Skew body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -402,7 +402,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8451439204989305657}
   - component: {fileID: 4881118971275662778}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Skew
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -447,4 +447,8 @@ MonoBehaviour:
   - {fileID: 7502174136761190912}
   - {fileID: 2128831671054088683}
   - {fileID: 3694961778127650379}
+  mask:
+    serializedVersion: 2
+    m_Bits: 0
   myType: 3
+  currentRotation: 0

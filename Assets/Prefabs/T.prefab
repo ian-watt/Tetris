@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5953127517231641643}
   - component: {fileID: 5953127517231641642}
   - component: {fileID: 2947605133044358487}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: T body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -109,7 +109,7 @@ GameObject:
   - component: {fileID: 5953127517343631291}
   - component: {fileID: 5953127517343631290}
   - component: {fileID: 8145636281972063765}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: T body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -207,7 +207,7 @@ GameObject:
   - component: {fileID: 5953127518492042691}
   - component: {fileID: 5953127518492042690}
   - component: {fileID: 1559519983706959983}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: T body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -305,7 +305,7 @@ GameObject:
   - component: {fileID: 5953127518915460562}
   - component: {fileID: 5953127518915460561}
   - component: {fileID: 5906222007240783315}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: T body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -402,7 +402,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5953127518953238845}
   - component: {fileID: 1155534047571938448}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: T
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -447,3 +447,8 @@ MonoBehaviour:
   - {fileID: 5906222007240783315}
   - {fileID: 1559519983706959983}
   - {fileID: 8145636281972063765}
+  mask:
+    serializedVersion: 2
+    m_Bits: 0
+  myType: 0
+  currentRotation: 0

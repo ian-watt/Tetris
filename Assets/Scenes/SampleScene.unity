@@ -244,9 +244,14 @@ MonoBehaviour:
   - {fileID: 8819229262733034402, guid: 9d52aa723ff82c046a13b5cd2af4d9d6, type: 3}
   - {fileID: 5767993804769458427, guid: 456a2e53826df044bb851ca651752a16, type: 3}
   - {fileID: 5953127518953238846, guid: 04fa047f919bc054e85d944b82248903, type: 3}
+  - {fileID: 6398563637189438758, guid: a558c60bf8c955347a523dda3224fd36, type: 3}
+  - {fileID: 4493717634455003058, guid: 5e53d233fcd768a46a6de28076512d6d, type: 3}
   tetrionBounds: {x: 11, y: 25}
   playAreaBounds: {x: 10, y: 24}
-  gameSpeed: 0.2
+  minoBounds: {x: 10.5, y: 1.5}
+  gameSpeed: 1
+  spedSpeed: 0.1
+  speedUp: 0
   currentTetromino: {fileID: 0}
   tetrominoesInPlay: []
   playArea: []

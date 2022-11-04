@@ -11,24 +11,24 @@ public class Tetromino : MonoBehaviour
     private float timePassed;
     public Vector2 position;
     public bool isFalling = false;
-    public BodyPart[] bodyParts;
-    public enum Type { T, Straight, Square, Skew, L }
+    public List<BodyPart> bodyParts;
+    private float oldSpeed;
+    private float newSpeed = .1f;
+    public LayerMask mask;
+    public enum Type { T, Straight, Square, Skew, L, L1, Skew1}
     public Type myType;
     public enum Rotation { Zero, One, Two, Three }
     public Rotation currentRotation;
     public SimulatedPiece simulatedPiece;
 
-    private void Awake()
-    {
-    }
     private void Update()
     {
-        timePassed += Time.deltaTime;
-        if (timePassed > GameManager.instance.gameSpeed && isFalling == true)
+
+        if(bodyParts.Count == 0)
         {
-            transform.position += Vector3.down * 1;
-            timePassed = 0;
+            Destroy(gameObject);
         }
+
         if (Input.GetKeyDown(KeyCode.A))
         {
             if (IsWithinBoundsNeg() == true && CompareTag("Current"))
@@ -44,58 +44,177 @@ public class Tetromino : MonoBehaviour
                 transform.localPosition += Vector3.right;
             }
         }
-        HandleRotation();
+        if (Input.GetMouseButtonDown(0))
+        {
+
+                GameManager.instance.speedUp = true;
+        }
+        if (Input.GetMouseButtonUp(0))
+        {
+            GameManager.instance.speedUp = false;
+        }
+
+        if (Input.GetMouseButtonDown(1))
+        {
+            HandleRotation();
+        }
 
     }
 
     private void HandleRotation()
     {
-        bool possible = false;
-        if (Input.GetKeyDown(KeyCode.R) && myType == Type.L && CompareTag("Current") && currentRotation == Rotation.Zero)
+        // L Rotation
+        if (myType == Type.L && CompareTag("Current") && currentRotation == Rotation.Zero)
         {
-            Clone();
-            UpdateCloneParts(new Vector3(1.5f, -1f, 0), new Vector3(1.5f, 0, 0), new Vector3(-.5f,-1, 0), new Vector3(.5f, -1, 0));
-            foreach (BodyPart part in simulatedPiece.bodyParts)
-            {
-                if (part.pos.x < 10.5f && part.pos.x > 1.5f && part.pos.y > 1.5f)
-                {
-                    possible = true;
-                }
-            }
-            if (possible)
-            {
-                for(int i = 0; i < bodyParts.Length; i++)
-                {
-                    bodyParts[i].transform.localPosition = simulatedPiece.bodyParts[i].transform.localPosition;
-                }
-            }
+            Rotate(new Vector3(-.5f, 1, 0), new Vector3(.5f, 1, 0), new Vector3(1.5f, 1, 0), new Vector3(-.5f, 0, 0), Rotation.One);
+        }
+        else if (myType == Type.L && CompareTag("Current") && currentRotation == Rotation.One)
+        {
+            Rotate(new Vector3(1.5f, 0, 0), new Vector3(.5f, 1, 0), new Vector3(1.5f,1, 0), new Vector3(1.5f, -1, 0), Rotation.Two);
+        }
+        else if (myType == Type.L && CompareTag("Current") && currentRotation == Rotation.Two)
+        {
+            Rotate(new Vector3(1.5f, 0, 0), new Vector3(.5f,-1, 0), new Vector3(-.5f, -1, 0), new Vector3(1.5f, -1, 0), Rotation.Three);
+        }
+        else if (myType == Type.L && CompareTag("Current") && currentRotation == Rotation.Three)
+        {
+            Rotate(new Vector3(-.5f, 0,0), new Vector3(-.5f, 1, 0), new Vector3(-.5f, -1, 0), new Vector3(.5f, -1, 0), Rotation.Zero);
+        }
 
+        //Straight Rotation
+        if(myType == Type.Straight && CompareTag("Current") && currentRotation == Rotation.Zero)
+        {
+            Rotate(new Vector3(-2, .5f, 0), new Vector3(-1, .5f, 0), new Vector3(1, .5f, 0), new Vector3(0, .5f, 0), Rotation.One);
+        }
+        else if(myType == Type.Straight && CompareTag("Current") && currentRotation == Rotation.One)
+        {
+            Rotate(new Vector3(0,.5f,0), new Vector3(0, -.5f, 0), new Vector3(0, -1.5f, 0), new Vector3(0, 1.5f, 0), Rotation.Zero);
+        }
+
+        // T Rotation
+        if (myType == Type.T && CompareTag("Current") && currentRotation == Rotation.Zero)
+        {
+            Rotate(new Vector3(0, 1, 0), new Vector3(-1, 0, 0), new Vector3(0, 0, 0), new Vector3(0, -1, 0), Rotation.One);
+        }
+        else if (myType == Type.T && CompareTag("Current") && currentRotation == Rotation.One)
+        {
+            Rotate(new Vector3(1, 0, 0), new Vector3(-1, 0, 0), new Vector3(0, 0, 0), new Vector3(0, 1, 0), Rotation.Two);
+            //new Vector3(1, 0, 0), new Vector3(0, 1, 0), new Vector3(0, 0, 0), new Vector3(0, -1, 0), Rotation.Two
+        }
+        else if (myType == Type.T && CompareTag("Current") && currentRotation == Rotation.Two)
+        {
+            Rotate(new Vector3(1, 0, 0), new Vector3(0, 1, 0), new Vector3(0, 0, 0), new Vector3(0, -1, 0), Rotation.Three);
+        }
+        else if (myType == Type.T && CompareTag("Current") && currentRotation == Rotation.Three)
+        {
+            Rotate(new Vector3(1, 0, 0), new Vector3(-1, 0, 0), new Vector3(0, 0, 0), new Vector3(0, -1, 0), Rotation.Zero);
+        }
+
+        //Skew Rotation
+        if(myType == Type.Skew && CompareTag("Current") && currentRotation == Rotation.Zero)
+        {
+            Rotate(new Vector3(-1, .5f, 0), new Vector3(0, -1.5f, 0), new Vector3(-1, -.5f, 0), new Vector3(0, -.5f, 0), Rotation.One);
+        }
+        else if (myType == Type.Skew && CompareTag("Current") && currentRotation == Rotation.One)
+        {
+            Rotate(new Vector3(1, .5f, 0), new Vector3(0, .5f, 0), new Vector3(-1, -.5f, 0), new Vector3(0, -.5f, 0), Rotation.Zero);
+        }
+
+        //L1 Rotation
+        if (myType == Type.L1 && CompareTag("Current") && currentRotation == Rotation.Zero)
+        {
+            Rotate(new Vector3(-.5f, 0, 0), new Vector3(-.5f, 1, 0), new Vector3(-.5f, -1, 0), new Vector3(.5f, 1, 0), Rotation.One);
+        }
+        else if (myType == Type.L1 && CompareTag("Current") && currentRotation == Rotation.One)
+        {
+            Rotate(new Vector3(-.5f, 0, 0), new Vector3(.5f, 0, 0), new Vector3(1.5f, 0, 0), new Vector3(1.5f, -1, 0), Rotation.Two);
+        }
+        else if (myType == Type.L1 && CompareTag("Current") && currentRotation == Rotation.Two)
+        {
+            Rotate(new Vector3(1.5f, -2, 0), new Vector3(.5f, -2, 0), new Vector3(1.5f, 0, 0), new Vector3(1.5f, -1, 0), Rotation.Three);
+        }
+        else if (myType == Type.L1 && CompareTag("Current") && currentRotation == Rotation.Three)
+        {
+            Rotate(new Vector3(-.5f, 0, 0), new Vector3(1.5f, -1, 0), new Vector3(-.5f, -1, 0), new Vector3(.5f, -1, 0), Rotation.Zero);
+        }
+
+        //Skew1 Rotation
+        if (myType == Type.Skew1 && CompareTag("Current") && currentRotation == Rotation.Zero)
+        {
+            Rotate(new Vector3(1, .5f, 0), new Vector3(0, .5f, 0), new Vector3(1, 1.5f, 0), new Vector3(0, -.5f, 0), Rotation.One);
+        }
+        else if (myType == Type.Skew1 && CompareTag("Current") && currentRotation == Rotation.One)
+        {
+            Rotate(new Vector3(-1, .5f, 0), new Vector3(0, .5f, 0), new Vector3(1, -.5f, 0), new Vector3(0, -.5f, 0), Rotation.Zero);
         }
     }
 
+    private void Rotate(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4, Rotation newRotation)
+    {
+        bool possible = true;
+        Clone();
+        UpdateCloneParts(p1, p2, p3, p4);
+
+        for (int x = 0; x < simulatedPiece.bodyParts.Count; x++)
+        {
+            if (simulatedPiece.bodyParts[x].pos.x > 10.5f || simulatedPiece.bodyParts[x].pos.x < 1.5f || simulatedPiece.bodyParts[x].pos.y < 1.5f)
+            {
+                possible = false;
+                break;
+            }
+        }
+        if (possible == true)
+        {
+            UpdateParts(p1, p2, p3, p4);
+            currentRotation = newRotation;
+            
+        }
+    }
+
+    private void UpdateParts(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4)
+    {
+        for (int i = 0; i < bodyParts.Count; i++)
+        {
+
+            if (i == 0)
+            {
+                bodyParts[i].transform.localPosition = p1;
+            }
+            else if (i == 1)
+            {
+                bodyParts[i].transform.localPosition = p2;
+            }
+            else if (i == 2)
+            {
+                bodyParts[i].transform.localPosition = p3;
+
+            }
+            else
+            {
+                bodyParts[i].transform.localPosition = p4;
+            }
+        }
+    }
     private void UpdateCloneParts(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4)
     {
-        //calculate distance from center and use that as a basis for the rotation check
-        for (int i = 0; i < simulatedPiece.bodyParts.Length; i++)
+
+        for (int i = 0; i < simulatedPiece.bodyParts.Count; i++)
         {
-            if(i == 0)
+            if (i == 0)
             {
-                simulatedPiece.bodyParts[i].transform.localPosition = p1;
                 simulatedPiece.bodyParts[i].pos = (Vector2)p1 + (Vector2)simulatedPiece.position;
-            }else if (i == 1)
+            }
+            else if (i == 1)
             {
-                simulatedPiece.bodyParts[i].transform.localPosition = p2;
                 simulatedPiece.bodyParts[i].pos = (Vector2)p2 + (Vector2)simulatedPiece.position;
             }
-            else if(i == 2)
+            else if (i == 2)
             {
-                simulatedPiece.bodyParts[i].transform.localPosition = p3;
                 simulatedPiece.bodyParts[i].pos = (Vector2)p3 + (Vector2)simulatedPiece.position;
 
             }
             else
             {
-                simulatedPiece.bodyParts[i].transform.localPosition = p4;
                 simulatedPiece.bodyParts[i].pos = (Vector2)p4 + (Vector2)simulatedPiece.position;
             }
         }
@@ -187,7 +306,6 @@ public class Tetromino : MonoBehaviour
         return x;
     }
 
-    [ContextMenu("Clone")]
     SimulatedPiece Clone()
     {
         simulatedPiece = new SimulatedPiece();
@@ -196,8 +314,8 @@ public class Tetromino : MonoBehaviour
         simulatedPiece.position = transform.localPosition;
         simulatedPiece.isFalling = isFalling;
         simulatedPiece.currentRotation = (SimulatedPiece.Rotation)currentRotation;
-        Debug.Log("My type: " + simulatedPiece.myType + " I have " + simulatedPiece.bodyParts.Length + " parts, my position in the play area is " + simulatedPiece.position);
-        foreach(BodyPart part in simulatedPiece.bodyParts)
+        Debug.Log("My type: " + simulatedPiece.myType + " I have " + simulatedPiece.bodyParts.Count + " parts, my position in the play area is " + simulatedPiece.position);
+        foreach (BodyPart part in simulatedPiece.bodyParts)
         {
             Debug.Log(part.pos);
         }
