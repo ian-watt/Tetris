@@ -162,6 +162,14 @@ public class Tetromino : MonoBehaviour
                 possible = false;
                 break;
             }
+            foreach(BodyPart part in GameManager.instance.placedParts)
+            {
+                if(simulatedPiece.bodyParts[x].pos.x == part.transform.localPosition.x && simulatedPiece.bodyParts[x].pos.y == part.transform.position.y)
+                {
+                    possible = false;
+                    break;
+                }
+            }
         }
         if (possible == true)
         {
@@ -240,13 +248,11 @@ public class Tetromino : MonoBehaviour
 
 
 
-            foreach (Tetromino mino in GameManager.instance.tetrominoesInPlay)
+            foreach (BodyPart body in GameManager.instance.placedParts)
             {
                 if (x != false)
                 {
-                    foreach (BodyPart otherPart in mino.bodyParts)
-                    {
-                        if (part.pos.x - 1 == otherPart.pos.x && part.pos.y == otherPart.pos.y)
+                        if (part.pos.x - 1 == body.pos.x && part.pos.y == body.pos.y)
                         {
                             x = false;
                             break;
@@ -255,10 +261,7 @@ public class Tetromino : MonoBehaviour
                         {
                             x = true;
                         }
-                    }
                 }
-
-
             }
 
         }
@@ -283,24 +286,20 @@ public class Tetromino : MonoBehaviour
                     x = true;
                 }
             }
-            foreach (Tetromino mino in GameManager.instance.tetrominoesInPlay)
+            foreach (BodyPart body in GameManager.instance.placedParts)
             {
                 if (x != false)
                 {
-                    foreach (BodyPart otherPart in mino.bodyParts)
+                    if (part.pos.x + 1 == body.pos.x && part.pos.y == body.pos.y)
                     {
-                        if (part.pos.x + 1 == otherPart.pos.x && part.pos.y == otherPart.pos.y)
-                        {
-                            x = false;
-                            break;
-                        }
-                        else
-                        {
-                            x = true;
-                        }
+                        x = false;
+                        break;
+                    }
+                    else
+                    {
+                        x = true;
                     }
                 }
-
             }
         }
         return x;
@@ -314,11 +313,6 @@ public class Tetromino : MonoBehaviour
         simulatedPiece.position = transform.localPosition;
         simulatedPiece.isFalling = isFalling;
         simulatedPiece.currentRotation = (SimulatedPiece.Rotation)currentRotation;
-        Debug.Log("My type: " + simulatedPiece.myType + " I have " + simulatedPiece.bodyParts.Count + " parts, my position in the play area is " + simulatedPiece.position);
-        foreach (BodyPart part in simulatedPiece.bodyParts)
-        {
-            Debug.Log(part.pos);
-        }
 
         return simulatedPiece;
 

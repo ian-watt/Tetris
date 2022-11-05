@@ -22,7 +22,11 @@ public class GameManager : MonoBehaviour
     public Tetromino currentTetromino;
     public List<Tetromino> tetrominoesInPlay;
     public List<PlayArea> playArea;
+    public List<BodyPart> placedParts;
+    public GameObject holdWindow;
     private int spawnRange;
+    private int nextPiece;
+    private bool pieceHeld;
 
     List<PlayArea> occupiedRow = new List<PlayArea>();
 
@@ -31,15 +35,19 @@ public class GameManager : MonoBehaviour
         instance = this;
         CreateTetrion();
         CreatePlayArea();
-}
+    }
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            HoldPiece();
+        }
 
-        
         if (currentTetromino.isFalling == false)
         {
-            SpawnTetromino();
+            
+            SpawnTetromino(ReturnRandomIndex());
         }
 
 
@@ -48,13 +56,15 @@ public class GameManager : MonoBehaviour
         {
             if (timePassed > spedSpeed && currentTetromino.isFalling == true)
             {
-                HandleTetrominoes();
-                if (currentTetromino.isFalling == true)
-                {
-                    currentTetromino.transform.localPosition += Vector3.down * 1;
-                }
+                    HandleTetrominoes();
 
-                timePassed = 0;
+                    if (currentTetromino.isFalling == true)
+                    {
+                        currentTetromino.transform.localPosition += Vector3.down * 1;
+                    }
+
+                    timePassed = 0;
+                
             }
         }
         else
@@ -62,6 +72,7 @@ public class GameManager : MonoBehaviour
             if (timePassed > gameSpeed && currentTetromino.isFalling == true)
             {
                 HandleTetrominoes();
+                
                 if (currentTetromino.isFalling == true)
                 {
                     currentTetromino.transform.localPosition += Vector3.down * 1;
@@ -70,11 +81,29 @@ public class GameManager : MonoBehaviour
             }
         }
         UpdateOccupiedPlayArea();
+        Tetris();
+
+    }
+
+    private void HoldPiece()
+    {
+        if(pieceHeld != true)
+        {
+            currentTetromino.isFalling = false;
+            currentTetromino.transform.position = new Vector3(-5.7f, 22.5f, 2);
+            currentTetromino.tag = ("Placed");
+            pieceHeld = true;
+        }
+        else
+        {
+
+        }
+        
     }
 
     private void Start()
     {
-        SpawnTetromino();
+        SpawnTetromino(ReturnRandomIndex());
     }
     //instantiate tetrion (game area borders)
     private void CreateTetrion()
@@ -98,6 +127,28 @@ public class GameManager : MonoBehaviour
                 goYRight.transform.localPosition = new Vector3(11.5f, y + .5f, -2);
             }
         }
+
+        for (int x = 0; x <= 11; x++)
+        {
+            GameObject goXBottom = Instantiate(tetrionPrefab);
+            GameObject goXTop = Instantiate(tetrionPrefab);
+            goXBottom.transform.parent = holdWindow.transform;
+            goXTop.transform.parent = holdWindow.transform;
+
+            goXBottom.transform.localPosition = new Vector3(x + .5f, .5f, -2);
+            goXTop.transform.localPosition = new Vector3(x + .5f, 9.5f, -2);
+            for (int y = 0; y <= 8; y++)
+            {
+                GameObject goYLeft = Instantiate(tetrionPrefab);
+                GameObject goYRight = Instantiate(tetrionPrefab);
+                goYLeft.transform.parent = holdWindow.transform;
+                goYRight.transform.parent = holdWindow.transform;
+                goYLeft.transform.localPosition = new Vector3(0.5f, y + .5f, -2);
+                goYRight.transform.localPosition = new Vector3(11.5f, y + .5f, -2);
+            }
+        }
+        holdWindow.transform.localScale = new Vector3(.5f, .5f, .5f);
+        holdWindow.transform.position = new Vector3(-8.7f, 20, 0);
     }
 
     //instantiate the play area ; when creating line removal logic potentially add them to a list
@@ -132,9 +183,9 @@ public class GameManager : MonoBehaviour
     }
 
     //instantiate a random tetromino prefab and assign it to the current falling tetromino, add to the list of tetrominoes currently in the play area
-    private void SpawnTetromino()
+    private void SpawnTetromino(int next)
     {
-        GameObject current = Instantiate(tetrominoPrefabs[3]);
+        GameObject current = Instantiate(tetrominoPrefabs[next]);
         currentTetromino = current.GetComponent<Tetromino>();
         current.transform.parent = tetrion.transform;
         current.transform.localPosition = startPos + current.transform.position;
@@ -145,51 +196,100 @@ public class GameManager : MonoBehaviour
 
     }
 
+
+
+    public int ReturnRandomIndex()
+    {
+        return Random.Range(0, tetrominoPrefabs.Length);
+    }
+
     //check if the current tetromino is touching the bottom ; if true, stop it from moving
     public void IsCurrentTouchingBottom(Tetromino current)
     {
-        foreach (BodyPart part in current.bodyParts)
+        for (int x = 0; x < current.bodyParts.Count; x++)
         {
-            if (part.pos.y == 1.5f && part.transform.parent.CompareTag("Current"))
+            if (current.bodyParts[x].pos.y == 1.5f && current.bodyParts[x].transform.parent.CompareTag("Current"))
             {
 
-                current.isFalling = false;
-                tetrominoesInPlay.Add(current);
+                
+                for (int i = current.bodyParts.Count - 1; i >= 0; i--)
+                {
+                    current.bodyParts[i].transform.parent = tetrion.transform;
+                    current.bodyParts[i].transform.localPosition = new Vector3(current.bodyParts[i].pos.x, current.bodyParts[i].pos.y, -2f);
+                    placedParts.Add(current.bodyParts[i]);
+                    foreach (PlayArea area in playArea)
+                    {
+                        if (area.pos == current.bodyParts[i].pos)
+                        {
+                            current.bodyParts[i].occupiedArea = area;
+                        }
+                    }
+                    current.bodyParts.Remove(current.bodyParts[i]);
+                    
+
+                }
                 current.tag = ("Placed");
+                current.isFalling = false;
             }
         }
     }
 
     public void StackTetrominoes(Tetromino current)
     {
-        foreach (BodyPart part in current.bodyParts)
-            for (int y = 0; y < tetrominoesInPlay.Count; y++)
+        List<BodyPart> partsToRemove = new List<BodyPart>();
+        for (int b = 0; b < current.bodyParts.Count; b++)
+        {
+            for (int y = 0; y < placedParts.Count; y++)
             {
-                for (int x = 0; x < tetrominoesInPlay[y].bodyParts.Count; x++)
+
+                if (current.bodyParts[b].pos.y == placedParts[y].transform.localPosition.y + 1 && current.bodyParts[b].pos.x == placedParts[y].transform.localPosition.x && current.bodyParts[b].transform.parent.CompareTag("Current"))
                 {
-                    if (part.pos.y == tetrominoesInPlay[y].bodyParts[x].pos.y + 1 && part.pos.x == tetrominoesInPlay[y].bodyParts[x].pos.x && part.transform.parent.CompareTag("Current"))
+                    current.isFalling = false;
+                    current.tag = "Placed";
+                    for (int i = current.bodyParts.Count - 1; i >= 0; i--)
                     {
-                        current.isFalling = false;
-                        current.tag = "Placed";
-                        tetrominoesInPlay.Add(current);
+                        partsToRemove.Add(current.bodyParts[i]);
 
                     }
+                    
                 }
             }
+        }
+        NewMethod(current, partsToRemove);
     }
 
+    private void NewMethod(Tetromino current, List<BodyPart> partsToRemove)
+    {
+        for(int i = partsToRemove.Count - 1; i >= 0; i--)
+        {
+            current.bodyParts[i].transform.parent = tetrion.transform;
+            current.bodyParts[i].transform.localPosition = new Vector3(current.bodyParts[i].pos.x, current.bodyParts[i].pos.y, -2f);
+            placedParts.Add(partsToRemove[i]);
+            foreach (PlayArea area in playArea)
+            {
+                if (area.pos == current.bodyParts[i].pos)
+                {
+                    current.bodyParts[i].occupiedArea = area;
+                }
+            }
+            current.bodyParts.Remove(current.bodyParts[i]);
+            
+        }
+       
+
+    }
 
     public void UpdateOccupiedPlayArea()
     {
         foreach (PlayArea area in playArea)
         {
-            for (int x = 0; x < tetrominoesInPlay.Count; x++)
+            for (int x = 0; x < placedParts.Count; x++)
             {
-                for (int y = 0; y < tetrominoesInPlay[x].bodyParts.Count; y++)
+                if (placedParts[x] != null)
                 {
-                    if (area.pos == tetrominoesInPlay[x].bodyParts[y].pos)
+                    if (area.pos == placedParts[x].pos)
                     {
-                        area.currentPart = tetrominoesInPlay[x].bodyParts[y];
+                        area.currentPart = placedParts[x];
                     }
                 }
             }
@@ -205,7 +305,7 @@ public class GameManager : MonoBehaviour
         {
             if (CheckIfRowIsFull(x))
             {
-                if(x > highestLineCleared)
+                if (x > highestLineCleared)
                 {
                     highestLineCleared = x;
                 }
@@ -214,7 +314,7 @@ public class GameManager : MonoBehaviour
                 for (int y = 0; y < occupiedRow.Count; y++)
                 {
                     Debug.Log(occupiedRow[y].pos);
-                    occupiedRow[y].currentPart.gameObject.transform.parent.GetComponent<Tetromino>().bodyParts.Remove(occupiedRow[y].currentPart);
+                    placedParts.Remove(occupiedRow[y].currentPart);
                     Destroy(occupiedRow[y].currentPart.gameObject);
                 }
             }
@@ -224,19 +324,25 @@ public class GameManager : MonoBehaviour
         Debug.Log(linesCleared);
         if (CheckIfRowIsFull(highestLineCleared + 1) != true)
         {
-            for (int z = 0; z < tetrominoesInPlay.Count; z++)
+            for (int z = 0; z < placedParts.Count; z++)
             {
-                for (int b = 0; b < tetrominoesInPlay[z].bodyParts.Count; b++)
+
+                if (placedParts[z].transform.localPosition.y >= highestLineCleared + 1)
                 {
-                    if (tetrominoesInPlay[z].bodyParts[b].pos.y >= highestLineCleared + 1)
+                    placedParts[z].occupiedArea.currentPart = null;
+                    placedParts[z].transform.localPosition += new Vector3(0, -linesCleared, 0);
+                    foreach(PlayArea area in playArea)
                     {
-                        tetrominoesInPlay[z].bodyParts[b].transform.localPosition = tetrominoesInPlay[z].bodyParts[b].transform.localPosition + new Vector3(0,-linesCleared,0);
+                        if (area.pos.y - -linesCleared == placedParts[z].pos.y && area.pos.x == placedParts[z].pos.x)
+                        {
+                            placedParts[z].occupiedArea = area;
+                        }
                     }
                 }
             }
+
         }
-
-
+        
     }
     public bool CheckIfRowIsFull(float row)
     {
