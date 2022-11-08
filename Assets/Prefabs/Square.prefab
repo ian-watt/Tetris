@@ -98,6 +98,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pos: {x: 0, y: 0}
+  occupiedArea: {fileID: 0}
 --- !u!1 &8819229262034228969
 GameObject:
   m_ObjectHideFlags: 0
@@ -196,6 +197,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pos: {x: 0, y: 0}
+  occupiedArea: {fileID: 0}
 --- !u!1 &8819229262058112282
 GameObject:
   m_ObjectHideFlags: 0
@@ -294,6 +296,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pos: {x: 0, y: 0}
+  occupiedArea: {fileID: 0}
 --- !u!1 &8819229262733034402
 GameObject:
   m_ObjectHideFlags: 0
@@ -452,3 +455,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pos: {x: 0, y: 0}
+  occupiedArea: {fileID: 0}

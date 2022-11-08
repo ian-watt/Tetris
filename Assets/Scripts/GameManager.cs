@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using UnityEngine.Video;
 
 public class GameManager : MonoBehaviour
 {
@@ -24,9 +26,18 @@ public class GameManager : MonoBehaviour
     public List<PlayArea> playArea;
     public List<BodyPart> placedParts;
     public GameObject holdWindow;
-    private int spawnRange;
-    private int nextPiece;
     private bool pieceHeld;
+    public Tetromino heldPiece;
+    public Tetromino goBetweenPiece;
+    public GameObject nextWindow;
+    public Tetromino nextPiece;
+
+    public TextMeshProUGUI score;
+    private int scoreValue;
+    public TextMeshProUGUI level;
+    public int levelValue = 1;
+    public VideoPlayer videoPlayer;
+    public VideoClip[] backgrounds;
 
     List<PlayArea> occupiedRow = new List<PlayArea>();
 
@@ -35,10 +46,47 @@ public class GameManager : MonoBehaviour
         instance = this;
         CreateTetrion();
         CreatePlayArea();
+        videoPlayer.clip = backgrounds[Random.Range(0, backgrounds.Length)];
     }
 
     void Update()
     {
+        HandleLevelValue();
+        if (levelValue == 2)
+        {
+            gameSpeed = .9f;
+        }else if(levelValue == 3)
+        {
+            gameSpeed = .8f;
+        }else if (levelValue == 3)
+        {
+            gameSpeed = .7f;
+        }else if (levelValue == 4)
+        {
+            gameSpeed = .6f;
+        }else if(levelValue == 5)
+        {
+            gameSpeed = .5f;
+        }else if (levelValue == 6)
+        {
+            gameSpeed = .3f;
+        }else if (levelValue == 7)
+        {
+            gameSpeed = .2f;
+        }else if(levelValue == 8)
+        {
+            gameSpeed = .1f;
+        }else if(levelValue == 9)
+        {
+            gameSpeed = .05f;
+            spedSpeed = .03f;
+        }
+        else if(levelValue == 10)
+        {
+            gameSpeed = .03f;
+            spedSpeed = .02f;
+        }
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
             HoldPiece();
@@ -46,8 +94,9 @@ public class GameManager : MonoBehaviour
 
         if (currentTetromino.isFalling == false)
         {
-            
-            SpawnTetromino(ReturnRandomIndex());
+
+            SpawnTetromino(GetPrefabIndex(nextPiece));
+            DisplayNextPiece();
         }
 
 
@@ -56,15 +105,15 @@ public class GameManager : MonoBehaviour
         {
             if (timePassed > spedSpeed && currentTetromino.isFalling == true)
             {
-                    HandleTetrominoes();
+                HandleTetrominoes();
 
-                    if (currentTetromino.isFalling == true)
-                    {
-                        currentTetromino.transform.localPosition += Vector3.down * 1;
-                    }
+                if (currentTetromino.isFalling == true)
+                {
+                    currentTetromino.transform.localPosition += Vector3.down * 1;
+                }
 
-                    timePassed = 0;
-                
+                timePassed = 0;
+
             }
         }
         else
@@ -72,7 +121,7 @@ public class GameManager : MonoBehaviour
             if (timePassed > gameSpeed && currentTetromino.isFalling == true)
             {
                 HandleTetrominoes();
-                
+
                 if (currentTetromino.isFalling == true)
                 {
                     currentTetromino.transform.localPosition += Vector3.down * 1;
@@ -80,30 +129,153 @@ public class GameManager : MonoBehaviour
                 timePassed = 0;
             }
         }
+        
         UpdateOccupiedPlayArea();
         Tetris();
 
     }
 
+    private void HandleLevelValue()
+    {
+        level.text = "Level: " + levelValue;
+
+        if (scoreValue >= 5000 && scoreValue <= 10000)
+        {
+            levelValue = 2;
+        }
+        else if (scoreValue > 10000 && scoreValue <= 15000)
+        {
+            levelValue = 3;
+        }
+        else if (scoreValue > 15000 && scoreValue <= 20000)
+        {
+            levelValue = 4;
+        }
+        else if (scoreValue > 20000 && scoreValue <= 25000)
+        {
+            levelValue = 5;
+        }
+        else if (scoreValue > 25000 && scoreValue <= 30000)
+        {
+            levelValue = 6;
+        }
+        else if (scoreValue > 30000 && scoreValue <= 35000)
+        {
+            levelValue = 7;
+        }
+        else if (scoreValue > 35000 && scoreValue <= 40000)
+        {
+            levelValue = 8;
+        }
+        else if (scoreValue > 40000 && scoreValue <= 45000)
+        {
+            levelValue = 9;
+        }
+        else if (scoreValue > 45000 && scoreValue <= 50000)
+        {
+            levelValue = 10;
+        }
+        else if (scoreValue > 50000)
+        {
+            levelValue = 11;
+        }
+    }
+
+    private int GetPrefabIndex(Tetromino nextPiece)
+    {
+        int index = 0;
+        if(nextPiece.myType == Tetromino.Type.L)
+        {
+            index = 0;
+        }else if(nextPiece.myType == Tetromino.Type.Skew)
+        {
+            index = 1;
+        }
+        else if (nextPiece.myType == Tetromino.Type.Square)
+        {
+            index = 2;
+        }
+        else if (nextPiece.myType == Tetromino.Type.Straight)
+        {
+            index = 3;
+        }
+        else if (nextPiece.myType == Tetromino.Type.T)
+        {
+            index = 4;
+        }
+        else if (nextPiece.myType == Tetromino.Type.L1)
+        {
+            index = 5;
+        }
+        else if (nextPiece.myType == Tetromino.Type.Skew1)
+        {
+            index = 6;
+        }
+
+        return index;
+    }
+
     private void HoldPiece()
     {
-        if(pieceHeld != true)
+        Vector3 heldPiecePos;
+        if (pieceHeld != true)
         {
             currentTetromino.isFalling = false;
-            currentTetromino.transform.position = new Vector3(-5.7f, 22.5f, 2);
+            if(currentTetromino.myType == Tetromino.Type.L1)
+            {
+                currentTetromino.transform.localPosition = new Vector3(-6f, 23, 2);
+            }
+            else if (currentTetromino.myType == Tetromino.Type.T)
+            {
+                currentTetromino.transform.localPosition = new Vector3(-5.7f, 22.7f, 2);
+
+            }
+            else
+            {
+                currentTetromino.transform.localPosition = new Vector3(-5.7f, 22.5f, 2);
+
+            }
+            currentTetromino.transform.localScale = new Vector3(.7f, .7f, .7f);
             currentTetromino.tag = ("Placed");
+            heldPiece = currentTetromino;
             pieceHeld = true;
         }
         else
         {
+            heldPiecePos = heldPiece.transform.localPosition;
+            heldPiece.transform.localPosition = AssignHeldPosition(heldPiece, currentTetromino);
+            heldPiece.transform.localScale = new Vector3(1, 1, 1);
+            heldPiece.tag = ("Current");
+            heldPiece.isFalling = true;
+            if (currentTetromino.myType == Tetromino.Type.L1)
+            {
+                currentTetromino.transform.localPosition = new Vector3(-6f, 23, 2);
+            }
+            else if (currentTetromino.myType == Tetromino.Type.T)
+            {
+                currentTetromino.transform.localPosition = new Vector3(-5.7f, 22.7f, 2);
+
+            }
+            else
+            {
+                currentTetromino.transform.localPosition = new Vector3(-5.7f, 22.5f, 2);
+
+            }
+            currentTetromino.tag = ("Placed");
+            currentTetromino.transform.localScale = new Vector3(.7f, .7f, .7f);
+            currentTetromino.isFalling = false;
+            goBetweenPiece = currentTetromino;
+            currentTetromino = heldPiece;
+            heldPiece = goBetweenPiece;
 
         }
-        
+
     }
 
     private void Start()
     {
         SpawnTetromino(ReturnRandomIndex());
+        DisplayNextPiece();
     }
     //instantiate tetrion (game area borders)
     private void CreateTetrion()
@@ -149,6 +321,28 @@ public class GameManager : MonoBehaviour
         }
         holdWindow.transform.localScale = new Vector3(.5f, .5f, .5f);
         holdWindow.transform.position = new Vector3(-8.7f, 20, 0);
+
+        for (int x = 0; x <= 11; x++)
+        {
+            GameObject goXBottom = Instantiate(tetrionPrefab);
+            GameObject goXTop = Instantiate(tetrionPrefab);
+            goXBottom.transform.parent = nextWindow.transform;
+            goXTop.transform.parent = nextWindow.transform;
+
+            goXBottom.transform.localPosition = new Vector3(x + .5f, .5f, -2);
+            goXTop.transform.localPosition = new Vector3(x + .5f, 9.5f, -2);
+            for (int y = 0; y <= 8; y++)
+            {
+                GameObject goYLeft = Instantiate(tetrionPrefab);
+                GameObject goYRight = Instantiate(tetrionPrefab);
+                goYLeft.transform.parent = nextWindow.transform;
+                goYRight.transform.parent = nextWindow.transform;
+                goYLeft.transform.localPosition = new Vector3(0.5f, y + .5f, -2);
+                goYRight.transform.localPosition = new Vector3(11.5f, y + .5f, -2);
+            }
+        }
+        nextWindow.transform.localScale = new Vector3(.5f, .5f, .5f);
+        nextWindow.transform.position = new Vector3(-8.7f, 10, 0);
     }
 
     //instantiate the play area ; when creating line removal logic potentially add them to a list
@@ -211,7 +405,7 @@ public class GameManager : MonoBehaviour
             if (current.bodyParts[x].pos.y == 1.5f && current.bodyParts[x].transform.parent.CompareTag("Current"))
             {
 
-                
+
                 for (int i = current.bodyParts.Count - 1; i >= 0; i--)
                 {
                     current.bodyParts[i].transform.parent = tetrion.transform;
@@ -227,9 +421,11 @@ public class GameManager : MonoBehaviour
                     current.bodyParts.Remove(current.bodyParts[i]);
                     
 
+
                 }
                 current.tag = ("Placed");
                 current.isFalling = false;
+                score.text = ("Score: " + (scoreValue += 100));
             }
         }
     }
@@ -244,6 +440,7 @@ public class GameManager : MonoBehaviour
 
                 if (current.bodyParts[b].pos.y == placedParts[y].transform.localPosition.y + 1 && current.bodyParts[b].pos.x == placedParts[y].transform.localPosition.x && current.bodyParts[b].transform.parent.CompareTag("Current"))
                 {
+                    score.text = ("Score: " + (scoreValue += 100));
                     current.isFalling = false;
                     current.tag = "Placed";
                     for (int i = current.bodyParts.Count - 1; i >= 0; i--)
@@ -251,16 +448,16 @@ public class GameManager : MonoBehaviour
                         partsToRemove.Add(current.bodyParts[i]);
 
                     }
-                    
+
                 }
             }
         }
-        NewMethod(current, partsToRemove);
+        RemoveParts(current, partsToRemove);
     }
 
-    private void NewMethod(Tetromino current, List<BodyPart> partsToRemove)
+    private void RemoveParts(Tetromino current, List<BodyPart> partsToRemove)
     {
-        for(int i = partsToRemove.Count - 1; i >= 0; i--)
+        for (int i = partsToRemove.Count - 1; i >= 0; i--)
         {
             current.bodyParts[i].transform.parent = tetrion.transform;
             current.bodyParts[i].transform.localPosition = new Vector3(current.bodyParts[i].pos.x, current.bodyParts[i].pos.y, -2f);
@@ -273,9 +470,9 @@ public class GameManager : MonoBehaviour
                 }
             }
             current.bodyParts.Remove(current.bodyParts[i]);
-            
+
         }
-       
+
 
     }
 
@@ -313,9 +510,11 @@ public class GameManager : MonoBehaviour
                 Debug.Log(occupiedRow.Count);
                 for (int y = 0; y < occupiedRow.Count; y++)
                 {
-                    Debug.Log(occupiedRow[y].pos);
-                    placedParts.Remove(occupiedRow[y].currentPart);
-                    Destroy(occupiedRow[y].currentPart.gameObject);
+                    
+                        Debug.Log(occupiedRow[y].pos);
+                        placedParts.Remove(occupiedRow[y].currentPart);
+                        Destroy(occupiedRow[y].currentPart.gameObject);
+                    
                 }
             }
         }
@@ -324,6 +523,7 @@ public class GameManager : MonoBehaviour
         Debug.Log(linesCleared);
         if (CheckIfRowIsFull(highestLineCleared + 1) != true)
         {
+            score.text = "Score: " + (scoreValue += 1000 * linesCleared);
             for (int z = 0; z < placedParts.Count; z++)
             {
 
@@ -331,7 +531,7 @@ public class GameManager : MonoBehaviour
                 {
                     placedParts[z].occupiedArea.currentPart = null;
                     placedParts[z].transform.localPosition += new Vector3(0, -linesCleared, 0);
-                    foreach(PlayArea area in playArea)
+                    foreach (PlayArea area in playArea)
                     {
                         if (area.pos.y - -linesCleared == placedParts[z].pos.y && area.pos.x == placedParts[z].pos.x)
                         {
@@ -342,7 +542,7 @@ public class GameManager : MonoBehaviour
             }
 
         }
-        
+
     }
     public bool CheckIfRowIsFull(float row)
     {
@@ -364,6 +564,142 @@ public class GameManager : MonoBehaviour
             }
         }
         return rowFullyOccupied;
+
+    }
+
+    private Vector3 AssignHeldPosition(Tetromino held, Tetromino current)
+    {
+        Vector3 newPosition = new Vector3();
+
+        if (held.myType == current.myType)
+        {
+            newPosition = currentTetromino.transform.localPosition;
+        }
+        else if (held.myType == Tetromino.Type.L || held.myType == Tetromino.Type.L1)
+        {
+            if (current.myType == Tetromino.Type.Skew || current.myType == Tetromino.Type.Skew1 || current.myType == Tetromino.Type.Straight)
+            {
+                newPosition = current.transform.localPosition + new Vector3(.5f, -.5f, 0);
+            }
+            else if (current.myType == Tetromino.Type.Square)
+            {
+                newPosition = current.transform.localPosition + new Vector3(0, -.5f, 0);
+
+            }else if(current.myType == Tetromino.Type.L || current.myType == Tetromino.Type.L1)
+            {
+                newPosition = current.transform.localPosition;
+            }
+            else
+            {
+                newPosition = current.transform.localPosition + new Vector3(.5f, 0, 0);
+            }
+        }
+        else if (held.myType == Tetromino.Type.Skew || held.myType == Tetromino.Type.Skew1 || held.myType == Tetromino.Type.Straight)
+        {
+            if (current.myType == Tetromino.Type.L || current.myType == Tetromino.Type.L1)
+            {
+                newPosition = current.transform.localPosition + new Vector3(-.5f, .5f, 0);
+            }
+            else if (current.myType == Tetromino.Type.Square)
+            {
+                newPosition = current.transform.localPosition + new Vector3(-.5f, 0, 0);
+            }
+            else if (current.myType == Tetromino.Type.T)
+            {
+                newPosition = current.transform.localPosition + new Vector3(0, .5f, 0);
+            }
+            else
+            {
+                newPosition = current.transform.localPosition;
+            }
+        }
+        else if (held.myType == Tetromino.Type.Square)
+        {
+            if (current.myType == Tetromino.Type.L1 || current.myType == Tetromino.Type.L)
+            {
+                newPosition = current.transform.localPosition + new Vector3(0, .5f, 0);
+            }
+            else if (current.myType == Tetromino.Type.Skew || current.myType == Tetromino.Type.Skew1 || current.myType == Tetromino.Type.Straight)
+            {
+                newPosition = current.transform.localPosition + new Vector3(.5f, 0, 0);
+
+            }
+            else
+            {
+                newPosition = current.transform.localPosition + new Vector3(.5f, .5f, 0);
+
+            }
+        }
+        else
+        {
+            if (current.myType == Tetromino.Type.L || current.myType == Tetromino.Type.L1)
+            {
+                newPosition = current.transform.localPosition + new Vector3(-.5f, 0, 0);
+            }
+            else if (current.myType == Tetromino.Type.Skew || current.myType == Tetromino.Type.Skew1 || current.myType == Tetromino.Type.Straight)
+            {
+                newPosition = current.transform.localPosition + new Vector3(0, -.5f, 0);
+
+            }
+            else if (current.myType == Tetromino.Type.Square)
+            {
+                newPosition = current.transform.localPosition + new Vector3(-.5f, -.5f, 0);
+
+            }
+        }
+        return newPosition;
+    }
+
+    private void DisplayNextPiece()
+    {
+        if (nextPiece == null)
+        {
+            GameObject go = Instantiate(tetrominoPrefabs[ReturnRandomIndex()]);
+            go.transform.parent = nextWindow.transform;
+            if (go.GetComponent<Tetromino>().myType == Tetromino.Type.L1)
+            {
+                go.transform.localPosition = new Vector3(5, 6, 0);
+            }
+            else if (go.GetComponent<Tetromino>().myType == Tetromino.Type.T)
+            {
+                go.transform.localPosition = new Vector3(6, 5.7f, 0);
+
+            }
+            else
+            {
+                go.transform.localPosition = new Vector3(6, 5, 0);
+
+
+                
+            }
+            go.transform.localScale = new Vector3(1.5f,1.5f, 1.5f);
+            nextPiece = go.GetComponent<Tetromino>();
+        }
+        else
+        {
+            Destroy(nextPiece.gameObject);
+            GameObject go = Instantiate(tetrominoPrefabs[ReturnRandomIndex()]);
+            go.transform.parent = nextWindow.transform;
+            if (go.GetComponent<Tetromino>().myType == Tetromino.Type.L1)
+            {
+                go.transform.localPosition = new Vector3(5, 6, 0);
+            }
+            else if (go.GetComponent<Tetromino>().myType == Tetromino.Type.T)
+            {
+                go.transform.localPosition = new Vector3(6, 5.7f, 0);
+
+            }
+            else
+            {
+                go.transform.localPosition = new Vector3(6, 5, 0);
+
+
+
+            }
+            go.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
+            nextPiece = go.GetComponent<Tetromino>();
+        }
+
 
     }
 
