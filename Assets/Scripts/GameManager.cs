@@ -1,8 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using TMPro;
-using Unity.VisualScripting;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Video;
 
@@ -38,6 +36,11 @@ public class GameManager : MonoBehaviour
     public int levelValue = 1;
     public VideoPlayer videoPlayer;
     public VideoClip[] backgrounds;
+
+    public AudioSource audioManager;
+    public AudioClip blockPlaced;
+    public AudioClip tetrisSmall;
+    public AudioClip tetrisBig;
 
     List<PlayArea> occupiedRow = new List<PlayArea>();
 
@@ -425,6 +428,8 @@ public class GameManager : MonoBehaviour
                 }
                 current.tag = ("Placed");
                 current.isFalling = false;
+                audioManager.PlayOneShot(blockPlaced);
+                
                 score.text = ("Score: " + (scoreValue += 100));
             }
         }
@@ -442,6 +447,7 @@ public class GameManager : MonoBehaviour
                 {
                     score.text = ("Score: " + (scoreValue += 100));
                     current.isFalling = false;
+                    audioManager.PlayOneShot(blockPlaced);
                     current.tag = "Placed";
                     for (int i = current.bodyParts.Count - 1; i >= 0; i--)
                     {
@@ -493,15 +499,19 @@ public class GameManager : MonoBehaviour
         }
     }
 
+
+    // pass each occupied line into a new list and move down blocks by looping through that list
     [ContextMenu("Tetris")]
     public void Tetris()
     {
+        List<List<PlayArea>> playAreaList = new List<List<PlayArea>>();
         float highestLineCleared = 0;
         int linesCleared = 0;
         for (float x = 1.5f; x <= 24.5f; x++)
         {
             if (CheckIfRowIsFull(x))
             {
+                playAreaList.Add(occupiedRow);
                 if (x > highestLineCleared)
                 {
                     highestLineCleared = x;
@@ -518,9 +528,37 @@ public class GameManager : MonoBehaviour
                 }
             }
         }
-        Debug.Log(highestLineCleared);
-        Debug.Log(CheckIfRowIsFull(highestLineCleared + 1));
-        Debug.Log(linesCleared);
+        foreach(List<PlayArea> p in playAreaList)
+        {
+            for(int z = 0; z < p.Count; z++)
+            {
+                foreach (List<PlayArea> x in playAreaList)
+                {
+                    for (int y = 0; y < x.Count; y++)
+                    {
+                        if (x[y].pos.y + 2 == p[z].pos.y)
+                        {
+                            foreach (BodyPart part in placedParts)
+                            {
+                                if(part.pos.y == x[y].pos.y + 1)
+                                {
+                                    part.occupiedArea.currentPart = null;
+                                    part.transform.localPosition += new Vector3(0, -1, 0);
+                                }else if(part.pos.y > x[y].pos.y + 1)
+                                {
+                                    part.occupiedArea.currentPart = null;
+                                    part.transform.localPosition += new Vector3(0, -2, 0);
+                                }
+                            }
+                        }
+                        if (x[y].pos.y + 3 == p[z].pos.y)
+                        {
+
+                        }
+                    }
+                }
+            }
+        }
         if (CheckIfRowIsFull(highestLineCleared + 1) != true)
         {
             score.text = "Score: " + (scoreValue += 1000 * linesCleared);
@@ -541,6 +579,13 @@ public class GameManager : MonoBehaviour
                 }
             }
 
+        }
+        if(linesCleared > 0 && linesCleared < 4)
+        {
+            audioManager.PlayOneShot(tetrisSmall);
+        }else if  (linesCleared >= 4)
+        {
+            audioManager.PlayOneShot(tetrisBig);
         }
 
     }
