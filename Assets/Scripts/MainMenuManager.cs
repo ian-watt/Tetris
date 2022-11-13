@@ -1,9 +1,6 @@
-using System;
+
 using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using Unity.VisualScripting;
-using UnityEditorInternal;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -22,11 +19,66 @@ public class MainMenuManager : MonoBehaviour
     private bool sfxActive = true;
     private bool bgmActive = true;
     public Animator fadeController;
+    public Canvas fadeObject;
+
+    public TextMeshProUGUI score1;
+    public TextMeshProUGUI score2;
+    public TextMeshProUGUI score3;
+    public TextMeshProUGUI score4;
+    public TextMeshProUGUI score5;
+    public int devScore = 123600;
 
     private void Awake()
     {
-       instance = this;
+        instance = this;
         StartCoroutine(ActivateButtons());
+
+        SaveLoad.Instance.LoadScore();
+        AssignHighScores();
+    }
+
+    private void AssignHighScores()
+    {
+        if(SaveLoad.Instance.score1 != 0)
+        {
+            score1.text = "1. " + SaveLoad.Instance.name1 + " - " + SaveLoad.Instance.score1;
+        }
+        else
+        {
+            score1.text = "1. EMPTY";
+        }
+        if (SaveLoad.Instance.score2 != 0)
+        {
+            score2.text = "2. " + SaveLoad.Instance.name2 + " - " + SaveLoad.Instance.score2;
+        }
+        else
+        {
+            score2.text = "2. EMPTY";
+        }
+        if (SaveLoad.Instance.score3 != 0)
+        {
+            score3.text = "3. " + SaveLoad.Instance.name3 + " - " + SaveLoad.Instance.score3;
+        }
+        else
+        {
+            score3.text = "3. EMPTY";
+        }
+        if (SaveLoad.Instance.score4 != 0)
+        {
+            score4.text = "4. " + SaveLoad.Instance.name4 + " - " + SaveLoad.Instance.score4;
+        }
+        else
+        {
+            score4.text = "4. EMPTY";
+        }
+        if (SaveLoad.Instance.score5 != 0)
+        {
+            score5.text = "5. " + SaveLoad.Instance.name5 + " - " + SaveLoad.Instance.score5;
+        }
+        else
+        {
+            score5.text = "5. EMPTY";
+        }
     }
 
     public IEnumerator ActivateButtons()
@@ -44,6 +96,7 @@ public class MainMenuManager : MonoBehaviour
     public void SwitchScene(int index)
     {
         StartCoroutine(FadeOutAndSwitch(index));
+        fadeObject.sortingOrder = 1;
         fadeController.SetBool("fade", true);
         
     }

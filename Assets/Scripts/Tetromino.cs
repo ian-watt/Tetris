@@ -3,14 +3,11 @@ using UnityEngine;
 
 public class Tetromino : MonoBehaviour
 {
-    private float timePassed;
     public Vector2 position;
     public bool isFalling = false;
     public List<BodyPart> bodyParts;
-    private float oldSpeed;
-    private float newSpeed = .1f;
     public LayerMask mask;
-    public enum Type { T, Straight, Square, Skew, L, L1, Skew1}
+    public enum Type { T, Straight, Square, Skew, L, L1, Skew1 }
     public Type myType;
     public enum Rotation { Zero, One, Two, Three }
     public Rotation currentRotation;
@@ -18,42 +15,43 @@ public class Tetromino : MonoBehaviour
 
     private void Update()
     {
-
-        if(bodyParts.Count == 0)
+        if (GameManager.instance.isGameOver == false && GameManager.instance.paused == false)
         {
-            Destroy(gameObject);
-        }
-
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            if (IsWithinBoundsNeg() == true && CompareTag("Current"))
+            if (bodyParts.Count == 0)
             {
-                transform.localPosition += Vector3.left;
+                Destroy(gameObject);
+            }
 
-            }
-        }
-        if (Input.GetKeyDown(KeyCode.D) && CompareTag("Current"))
-        {
-            if (IsWithinBoundsPos() == true)
+            if (Input.GetKeyDown(KeyCode.A) || Input.GetKeyDown(KeyCode.LeftArrow))
             {
-                transform.localPosition += Vector3.right;
+                if (IsWithinBoundsNeg() == true && CompareTag("Current"))
+                {
+                    transform.localPosition += Vector3.left;
+
+                }
             }
-        }
-        if (Input.GetMouseButtonDown(0))
-        {
+            if (Input.GetKeyDown(KeyCode.D) && CompareTag("Current") || Input.GetKeyDown(KeyCode.RightArrow) && CompareTag("Current"))
+            {
+                if (IsWithinBoundsPos() == true)
+                {
+                    transform.localPosition += Vector3.right;
+                }
+            }
+            if (Input.GetMouseButtonDown(0))
+            {
 
                 GameManager.instance.speedUp = true;
-        }
-        if (Input.GetMouseButtonUp(0))
-        {
-            GameManager.instance.speedUp = false;
-        }
+            }
+            if (Input.GetMouseButtonUp(0))
+            {
+                GameManager.instance.speedUp = false;
+            }
 
-        if (Input.GetMouseButtonDown(1))
-        {
-            HandleRotation();
+            if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.R))
+            {
+                HandleRotation();
+            }
         }
-
     }
 
     private void HandleRotation()
@@ -65,25 +63,25 @@ public class Tetromino : MonoBehaviour
         }
         else if (myType == Type.L && CompareTag("Current") && currentRotation == Rotation.One)
         {
-            Rotate(new Vector3(1.5f, 0, 0), new Vector3(.5f, 1, 0), new Vector3(1.5f,1, 0), new Vector3(1.5f, -1, 0), Rotation.Two);
+            Rotate(new Vector3(1.5f, 0, 0), new Vector3(.5f, 1, 0), new Vector3(1.5f, 1, 0), new Vector3(1.5f, -1, 0), Rotation.Two);
         }
         else if (myType == Type.L && CompareTag("Current") && currentRotation == Rotation.Two)
         {
-            Rotate(new Vector3(1.5f, 0, 0), new Vector3(.5f,-1, 0), new Vector3(-.5f, -1, 0), new Vector3(1.5f, -1, 0), Rotation.Three);
+            Rotate(new Vector3(1.5f, 0, 0), new Vector3(.5f, -1, 0), new Vector3(-.5f, -1, 0), new Vector3(1.5f, -1, 0), Rotation.Three);
         }
         else if (myType == Type.L && CompareTag("Current") && currentRotation == Rotation.Three)
         {
-            Rotate(new Vector3(-.5f, 0,0), new Vector3(-.5f, 1, 0), new Vector3(-.5f, -1, 0), new Vector3(.5f, -1, 0), Rotation.Zero);
+            Rotate(new Vector3(-.5f, 0, 0), new Vector3(-.5f, 1, 0), new Vector3(-.5f, -1, 0), new Vector3(.5f, -1, 0), Rotation.Zero);
         }
 
         //Straight Rotation
-        if(myType == Type.Straight && CompareTag("Current") && currentRotation == Rotation.Zero)
+        if (myType == Type.Straight && CompareTag("Current") && currentRotation == Rotation.Zero)
         {
             Rotate(new Vector3(-2, .5f, 0), new Vector3(-1, .5f, 0), new Vector3(1, .5f, 0), new Vector3(0, .5f, 0), Rotation.One);
         }
-        else if(myType == Type.Straight && CompareTag("Current") && currentRotation == Rotation.One)
+        else if (myType == Type.Straight && CompareTag("Current") && currentRotation == Rotation.One)
         {
-            Rotate(new Vector3(0,.5f,0), new Vector3(0, -.5f, 0), new Vector3(0, -1.5f, 0), new Vector3(0, 1.5f, 0), Rotation.Zero);
+            Rotate(new Vector3(0, .5f, 0), new Vector3(0, -.5f, 0), new Vector3(0, -1.5f, 0), new Vector3(0, 1.5f, 0), Rotation.Zero);
         }
 
         // T Rotation
@@ -106,7 +104,7 @@ public class Tetromino : MonoBehaviour
         }
 
         //Skew Rotation
-        if(myType == Type.Skew && CompareTag("Current") && currentRotation == Rotation.Zero)
+        if (myType == Type.Skew && CompareTag("Current") && currentRotation == Rotation.Zero)
         {
             Rotate(new Vector3(-1, .5f, 0), new Vector3(0, -1.5f, 0), new Vector3(-1, -.5f, 0), new Vector3(0, -.5f, 0), Rotation.One);
         }
@@ -157,9 +155,9 @@ public class Tetromino : MonoBehaviour
                 possible = false;
                 break;
             }
-            foreach(BodyPart part in GameManager.instance.placedParts)
+            foreach (BodyPart part in GameManager.instance.placedParts)
             {
-                if(simulatedPiece.bodyParts[x].pos.x == part.transform.localPosition.x && simulatedPiece.bodyParts[x].pos.y == part.transform.position.y)
+                if (simulatedPiece.bodyParts[x].pos.x == part.transform.localPosition.x && simulatedPiece.bodyParts[x].pos.y == part.transform.position.y)
                 {
                     possible = false;
                     break;
@@ -170,7 +168,7 @@ public class Tetromino : MonoBehaviour
         {
             UpdateParts(p1, p2, p3, p4);
             currentRotation = newRotation;
-            
+
         }
     }
 
@@ -247,15 +245,15 @@ public class Tetromino : MonoBehaviour
             {
                 if (x != false)
                 {
-                        if (part.pos.x - 1 == body.pos.x && part.pos.y == body.pos.y)
-                        {
-                            x = false;
-                            break;
-                        }
-                        else
-                        {
-                            x = true;
-                        }
+                    if (part.pos.x - 1 == body.pos.x && part.pos.y == body.pos.y)
+                    {
+                        x = false;
+                        break;
+                    }
+                    else
+                    {
+                        x = true;
+                    }
                 }
             }
 

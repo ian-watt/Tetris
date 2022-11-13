@@ -1,7 +1,9 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+
 using TMPro;
+
 using UnityEngine;
+
 using UnityEngine.Video;
 
 public class GameManager : MonoBehaviour
@@ -29,6 +31,10 @@ public class GameManager : MonoBehaviour
     public Tetromino goBetweenPiece;
     public GameObject nextWindow;
     public Tetromino nextPiece;
+    public GameObject gameOverMenu;
+    public bool bgmActive = true;
+    public bool sfxActive = true;
+    public AudioClip gameOverClip;
 
     public TextMeshProUGUI score;
     private int scoreValue;
@@ -41,8 +47,26 @@ public class GameManager : MonoBehaviour
     public AudioClip blockPlaced;
     public AudioClip tetrisSmall;
     public AudioClip tetrisBig;
+    public string attemptName;
+    public TextMeshProUGUI inputName;
+    public TextMeshProUGUI confirmation;
+    public TextMeshProUGUI error;
+    public int attemptScore;
+    public bool isGameOver = false;
+
+    List<PlayArea> list1 = new List<PlayArea>();
+    List<PlayArea> list2 = new List<PlayArea>();
+    List<PlayArea> list3 = new List<PlayArea>();
+    List<PlayArea> list4 = new List<PlayArea>();
 
     List<PlayArea> occupiedRow = new List<PlayArea>();
+    public GameObject pauseMenu;
+    public GameObject optionsMenu;
+    public GameObject tutorialMenu;
+    public AudioClip menuButtonSFX;
+    public GameObject musicCheck;
+    public GameObject sfxCheck;
+    public bool paused = false;
 
     void Awake()
     {
@@ -54,40 +78,105 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        HandleLevelValue();
+
+        if (Input.GetKeyDown(KeyCode.Escape) && pauseMenu.activeInHierarchy == false && optionsMenu.activeInHierarchy == false && tutorialMenu.activeInHierarchy == false && isGameOver == false)
+        {
+            pauseMenu.SetActive(true);
+            paused = true;
+            Time.timeScale = 0;
+        }else if (Input.GetKeyDown(KeyCode.Escape) && pauseMenu.activeInHierarchy == true)
+        {
+            pauseMenu.SetActive(false);
+            paused = false;
+            Time.timeScale = 1;
+        }
+            HandleLevelValue();
         if (levelValue == 2)
         {
+            gameSpeed = .95f;
+        }
+        else if (levelValue == 3)
+        {
             gameSpeed = .9f;
-        }else if(levelValue == 3)
+        }
+        else if (levelValue == 3)
+        {
+            gameSpeed = .85f;
+        }
+        else if (levelValue == 4)
         {
             gameSpeed = .8f;
-        }else if (levelValue == 3)
+        }
+        else if (levelValue == 5)
+        {
+            gameSpeed = .75f;
+        }
+        else if (levelValue == 6)
         {
             gameSpeed = .7f;
-        }else if (levelValue == 4)
+        }
+        else if (levelValue == 7)
+        {
+            gameSpeed = .65f;
+        }
+        else if (levelValue == 8)
         {
             gameSpeed = .6f;
-        }else if(levelValue == 5)
+        }
+        else if (levelValue == 9)
+        {
+            gameSpeed = .55f;
+        }
+        else if (levelValue == 10)
         {
             gameSpeed = .5f;
-        }else if (levelValue == 6)
+        }
+        else if (levelValue == 11)
+        {
+            gameSpeed = .45f;
+        }
+        else if (levelValue == 12)
+        {
+            gameSpeed = .4f;
+        }
+        else if (levelValue == 13)
+        {
+            gameSpeed = .35f;
+        }
+        else if (levelValue == 14)
         {
             gameSpeed = .3f;
-        }else if (levelValue == 7)
+        }
+        else if (levelValue == 15)
+        {
+            gameSpeed = .25f;
+        }
+        else if (levelValue == 16)
         {
             gameSpeed = .2f;
-        }else if(levelValue == 8)
+        }
+        else if (levelValue == 17)
+        {
+            gameSpeed = .15f;
+        }
+        else if (levelValue == 18)
         {
             gameSpeed = .1f;
-        }else if(levelValue == 9)
+            spedSpeed = .05f;
+        }
+        else if (levelValue == 19)
         {
             gameSpeed = .05f;
             spedSpeed = .03f;
         }
-        else if(levelValue == 10)
+        else if (levelValue == 20)
         {
             gameSpeed = .03f;
-            spedSpeed = .02f;
+            spedSpeed = .015f;
+        }else if(levelValue > 20)
+        {
+            gameSpeed = .03f;
+            spedSpeed = .015f;
         }
 
         if (Input.GetKeyDown(KeyCode.Space))
@@ -132,15 +221,67 @@ public class GameManager : MonoBehaviour
                 timePassed = 0;
             }
         }
-        
+
         UpdateOccupiedPlayArea();
         Tetris();
+        GameOver();
+    }
+
+    public void AssignAttemptName()
+    {
+        if(inputName.text.Length == 1)
+        {
+            error.gameObject.SetActive(true);
+        }
+        else
+        {
+            attemptName = inputName.text;
+            Debug.Log(attemptName);
+            attemptScore = scoreValue;
+            confirmation.gameObject.SetActive(true);
+            error.gameObject.SetActive(false);
+            SaveLoad.Instance.SaveScore();
+        }
+
+    }
+
+    private void GameOver()
+    {
+        if(isGameOver == false)
+        {
+            foreach (BodyPart block in placedParts)
+            {
+                if (block.pos.y > 24.5f)
+                {
+                    isGameOver = true;
+                    break;
+                }
+            }
+            if (isGameOver)
+            {
+                audioManager.PlayOneShot(gameOverClip, 2);
+                Time.timeScale = 0;
+                gameOverMenu.SetActive(true);
+                tetrion.SetActive(false);
+                nextWindow.SetActive(false);
+                holdWindow.SetActive(false);
+
+            }
+        }
 
     }
 
     private void HandleLevelValue()
     {
-        level.text = "Level: " + levelValue;
+        if(levelValue <= 20)
+        {
+            level.text = "Level: " + levelValue;
+        }
+        else
+        {
+            level.text = "Level: Tetris Master!!";
+        }
+        
 
         if (scoreValue >= 5000 && scoreValue <= 10000)
         {
@@ -178,19 +319,61 @@ public class GameManager : MonoBehaviour
         {
             levelValue = 10;
         }
-        else if (scoreValue > 50000)
+        else if (scoreValue > 50000 && scoreValue <= 55000)
         {
             levelValue = 11;
+        }
+        else if (scoreValue > 55000 && scoreValue <= 60000)
+        {
+            levelValue = 12;
+        }
+        else if (scoreValue > 60000 && scoreValue <= 65000)
+        {
+            levelValue = 13;
+        }
+        else if (scoreValue > 65000 && scoreValue <= 70000)
+        {
+            levelValue = 14;
+        }
+        else if (scoreValue > 70000 && scoreValue <= 75000)
+        {
+            levelValue = 15;
+        }
+        else if (scoreValue > 75000 && scoreValue <= 80000)
+        {
+            levelValue = 16;
+        }
+        else if (scoreValue > 80000 && scoreValue <= 85000)
+        {
+            levelValue = 17;
+        }
+        else if (scoreValue > 85000 && scoreValue <= 90000)
+        {
+            levelValue = 18;
+        }
+        else if (scoreValue > 90000 && scoreValue <= 95000)
+        {
+            levelValue = 19;
+
+        }
+        else if (scoreValue > 95000 && scoreValue <= 100000)
+        {
+            levelValue = 20;
+        }
+        else if(scoreValue > 100000)
+        {
+            levelValue = 21;
         }
     }
 
     private int GetPrefabIndex(Tetromino nextPiece)
     {
         int index = 0;
-        if(nextPiece.myType == Tetromino.Type.L)
+        if (nextPiece.myType == Tetromino.Type.L)
         {
             index = 0;
-        }else if(nextPiece.myType == Tetromino.Type.Skew)
+        }
+        else if (nextPiece.myType == Tetromino.Type.Skew)
         {
             index = 1;
         }
@@ -224,7 +407,7 @@ public class GameManager : MonoBehaviour
         if (pieceHeld != true)
         {
             currentTetromino.isFalling = false;
-            if(currentTetromino.myType == Tetromino.Type.L1)
+            if (currentTetromino.myType == Tetromino.Type.L1)
             {
                 currentTetromino.transform.localPosition = new Vector3(-6f, 23, 2);
             }
@@ -422,14 +605,18 @@ public class GameManager : MonoBehaviour
                         }
                     }
                     current.bodyParts.Remove(current.bodyParts[i]);
-                    
+
 
 
                 }
                 current.tag = ("Placed");
                 current.isFalling = false;
-                audioManager.PlayOneShot(blockPlaced);
+                if (sfxActive)
+                {
+                    audioManager.PlayOneShot(blockPlaced);
+                }
                 
+
                 score.text = ("Score: " + (scoreValue += 100));
             }
         }
@@ -447,7 +634,11 @@ public class GameManager : MonoBehaviour
                 {
                     score.text = ("Score: " + (scoreValue += 100));
                     current.isFalling = false;
-                    audioManager.PlayOneShot(blockPlaced);
+                    if (sfxActive)
+                    {
+                        audioManager.PlayOneShot(blockPlaced);
+                    }
+                    
                     current.tag = "Placed";
                     for (int i = current.bodyParts.Count - 1; i >= 0; i--)
                     {
@@ -482,17 +673,21 @@ public class GameManager : MonoBehaviour
 
     }
 
+    [ContextMenu("Update PlayArea")]
     public void UpdateOccupiedPlayArea()
     {
         foreach (PlayArea area in playArea)
         {
+            area.currentPart = null;
             for (int x = 0; x < placedParts.Count; x++)
             {
                 if (placedParts[x] != null)
                 {
                     if (area.pos == placedParts[x].pos)
                     {
+                        placedParts[x].occupiedArea = null;
                         area.currentPart = placedParts[x];
+                        placedParts[x].occupiedArea = area;
                     }
                 }
             }
@@ -500,94 +695,220 @@ public class GameManager : MonoBehaviour
     }
 
 
-    // pass each occupied line into a new list and move down blocks by looping through that list
     [ContextMenu("Tetris")]
     public void Tetris()
     {
-        List<List<PlayArea>> playAreaList = new List<List<PlayArea>>();
+        list1.Clear();
+        list2.Clear();
+        list3.Clear();
+        list4.Clear();
+
         float highestLineCleared = 0;
         int linesCleared = 0;
         for (float x = 1.5f; x <= 24.5f; x++)
         {
             if (CheckIfRowIsFull(x))
             {
-                playAreaList.Add(occupiedRow);
+                if (list1.Count == 0)
+                {
+                    foreach (PlayArea area in occupiedRow)
+                    {
+                        list1.Add(area);
+                    }
+                }
+                else if (list2.Count == 0)
+                {
+                    foreach (PlayArea area in occupiedRow)
+                    {
+                        list2.Add(area);
+                    }
+                }
+                else if (list3.Count == 0)
+                {
+                    foreach (PlayArea area in occupiedRow)
+                    {
+                        list3.Add(area);
+                    }
+                }
+                else if (list4.Count == 0)
+                {
+                    foreach (PlayArea area in occupiedRow)
+                    {
+                        list4.Add(area);
+                    }
+                }
                 if (x > highestLineCleared)
                 {
                     highestLineCleared = x;
                 }
                 linesCleared++;
-                Debug.Log(occupiedRow.Count);
+
+                for(int o = 0; o < list1.Count; o++)
+                {
+                    Debug.Log(list1[o].pos.y);
+                }
                 for (int y = 0; y < occupiedRow.Count; y++)
                 {
-                    
-                        Debug.Log(occupiedRow[y].pos);
-                        placedParts.Remove(occupiedRow[y].currentPart);
-                        Destroy(occupiedRow[y].currentPart.gameObject);
-                    
+                    placedParts.Remove(occupiedRow[y].currentPart);
+                    Destroy(occupiedRow[y].currentPart.gameObject);
+
                 }
             }
+            Debug.Log(list1.Count);
         }
-        foreach(List<PlayArea> p in playAreaList)
+
+        Debug.Log(linesCleared);
+        Debug.Log(highestLineCleared);
+
+        if (linesCleared == 2)
         {
-            for(int z = 0; z < p.Count; z++)
+            Debug.Log("Lines cleared = 2");
+            Debug.Log(list1.Count);
+            for (int y = 0; y < list1.Count; y++)
             {
-                foreach (List<PlayArea> x in playAreaList)
+                Debug.Log(list1[y].pos.y + "," + list2[y].pos.y);
+                if (list1[y].pos.y - 1 == list2[y].pos.y || list1[y].pos.y + 1 == list2[y].pos.y || list1[y].pos.y == list2[y].pos.y + 1 || list1[y].pos.y == list2[y].pos.y - 1)
                 {
-                    for (int y = 0; y < x.Count; y++)
+                    Debug.Log("Test, 2 lines connected as 1-2");
+                    foreach (BodyPart part in placedParts)
                     {
-                        if (x[y].pos.y + 2 == p[z].pos.y)
+                        if (part.transform.localPosition.y > highestLineCleared)
                         {
-                            foreach (BodyPart part in placedParts)
+                            part.transform.localPosition += new Vector3(0, -2, 0);
+                        }
+                    }
+                }
+                else if (list1[y].pos.y - 2 == list2[y].pos.y || list1[y].pos.y + 2 == list2[y].pos.y || list1[y].pos.y == list2[y].pos.y + 2 || list1[y].pos.y == list2[y].pos.y - 2)
+                {
+                    Debug.Log("Test, 2 lines connected as 1-3");
+                    foreach (BodyPart part in placedParts)
+                    {
+                        if (list1[y].pos.y < list2[y].pos.y)
+                        {
+                            if (part.transform.localPosition.y == list1[y].pos.y + 1 && y == 0)
                             {
-                                if(part.pos.y == x[y].pos.y + 1)
-                                {
-                                    part.occupiedArea.currentPart = null;
-                                    part.transform.localPosition += new Vector3(0, -1, 0);
-                                }else if(part.pos.y > x[y].pos.y + 1)
-                                {
-                                    part.occupiedArea.currentPart = null;
-                                    part.transform.localPosition += new Vector3(0, -2, 0);
-                                }
+
+                                part.transform.localPosition += new Vector3(0, -1, 0);
                             }
                         }
-                        if (x[y].pos.y + 3 == p[z].pos.y)
+                        if (part.transform.localPosition.y > highestLineCleared && y == 0)
                         {
 
+                            part.transform.localPosition += new Vector3(0, -2, 0);
                         }
                     }
                 }
-            }
-        }
-        if (CheckIfRowIsFull(highestLineCleared + 1) != true)
-        {
-            score.text = "Score: " + (scoreValue += 1000 * linesCleared);
-            for (int z = 0; z < placedParts.Count; z++)
-            {
-
-                if (placedParts[z].transform.localPosition.y >= highestLineCleared + 1)
+                else if (list1[y].pos.y - 3 == list2[y].pos.y || list1[y].pos.y + 3 == list2[y].pos.y || list1[y].pos.y == list2[y].pos.y + 3 || list1[y].pos.y == list2[y].pos.y - 3)
                 {
-                    placedParts[z].occupiedArea.currentPart = null;
-                    placedParts[z].transform.localPosition += new Vector3(0, -linesCleared, 0);
-                    foreach (PlayArea area in playArea)
+                    Debug.Log("Test. 2 lines connected as 1-4");
+                    foreach (BodyPart part in placedParts)
                     {
-                        if (area.pos.y - -linesCleared == placedParts[z].pos.y && area.pos.x == placedParts[z].pos.x)
+                        if (list1[y].pos.y < list2[y].pos.y)
                         {
-                            placedParts[z].occupiedArea = area;
+                            if (part.transform.localPosition.y == list1[y].pos.y + 1 && y == 0 || part.transform.localPosition.y == list1[y].pos.y + 2 && y == 0)
+                            {
+                                part.transform.localPosition += new Vector3(0, -1, 0);
+
+                            }
+                        }
+                        if (part.transform.localPosition.y > highestLineCleared && y == 0)
+                        {
+                            part.transform.localPosition += new Vector3(0, -2, 0);
                         }
                     }
                 }
             }
-
         }
-        if(linesCleared > 0 && linesCleared < 4)
+        else if (linesCleared == 3)
         {
-            audioManager.PlayOneShot(tetrisSmall);
-        }else if  (linesCleared >= 4)
-        {
-            audioManager.PlayOneShot(tetrisBig);
-        }
+            for (int y = 0; y < list1.Count; y++)
+            {
+                if (list1[y].pos.y + 1 == list2[y].pos.y && list1[y].pos.y + 2 == list3[y].pos.y)
+                {
+                    Debug.Log("Test. 3 lines connected as 1-2-3");
+                    foreach (BodyPart part in placedParts)
+                    {
+                        if (part.transform.localPosition.y > highestLineCleared)
+                        {
+                            part.transform.localPosition += new Vector3(0, -3, 0);
+                        }
+                    }
 
+
+                }
+                else if (list1[y].pos.y + 2 == list2[y].pos.y && list1[y].pos.y + 3 == list3[y].pos.y)
+                {
+                    Debug.Log("Test. 3 lines connected as 1-3-4");
+                    foreach (BodyPart part in placedParts)
+                    {
+                        if (part.transform.localPosition.y == list1[y].pos.y + 1 && y == 0)
+                        {
+                            part.transform.localPosition += new Vector3(0, -1, 0);
+                        }
+                        else if (part.transform.localPosition.y > highestLineCleared && y == 0)
+                        {
+                            part.transform.localPosition += new Vector3(0, -3, 0);
+                        }
+                    }
+
+                }
+                else if (list1[y].pos.y + 1 == list2[y].pos.y && list1[y].pos.y + 3 == list3[y].pos.y)
+                {
+                    Debug.Log("Test. 3 lines connected as 1-2-4");
+                    foreach (BodyPart part in placedParts)
+                    {
+                        if (part.transform.localPosition.y == list1[y].pos.y + 2 && y == 0)
+                        {
+                            part.transform.localPosition += new Vector3(0, -2, 0);
+                        }
+                        else if (part.transform.localPosition.y > highestLineCleared && y == 0)
+                        {
+                            part.transform.localPosition += new Vector3(0, -3, 0);
+                        }
+                    }
+
+                }
+            }
+        }
+        else if (linesCleared == 1)
+        {
+            Debug.Log("Yes.");
+            foreach (BodyPart part in placedParts)
+            {
+                if (part.pos.y > highestLineCleared)
+                {
+                    part.transform.localPosition += new Vector3(0, -1, 0);
+                }
+            }
+        }
+        else if (linesCleared == 4)
+        {
+            foreach (BodyPart part in placedParts)
+            {
+                if (part.pos.y > highestLineCleared)
+                {
+                    part.transform.localPosition += new Vector3(0, -4, 0);
+                }
+            }
+        }
+        if (linesCleared > 0 && linesCleared < 4)
+        {
+            if (sfxActive)
+            {
+                audioManager.PlayOneShot(tetrisSmall);
+            }
+            score.text = ("Score: " + (scoreValue += 1000));
+        }
+        else if (linesCleared >= 4)
+        {
+            if (sfxActive)
+            {
+                
+                audioManager.PlayOneShot(tetrisBig);
+
+            }
+            score.text = ("Score: " + (scoreValue += 4000));
+        }
     }
     public bool CheckIfRowIsFull(float row)
     {
@@ -612,6 +933,94 @@ public class GameManager : MonoBehaviour
 
     }
 
+    public void OpenOptionsMenu(GameObject desiredMenu)
+    {
+
+        desiredMenu.SetActive(true);
+        pauseMenu.SetActive(false);
+        if (sfxActive)
+        {
+            audioManager.PlayOneShot(menuButtonSFX, 1.5f);
+
+        }
+    }
+    public void ExitOptionsMenu(GameObject desiredMenu)
+    {
+        desiredMenu.SetActive(true);
+        optionsMenu.SetActive(false);
+        if (sfxActive)
+        {
+            audioManager.PlayOneShot(menuButtonSFX, 1.5f);
+
+        }
+    }
+
+    public void OpenTutorialMenu(GameObject desiredMenu)
+    {
+
+        desiredMenu.SetActive(true);
+        pauseMenu.SetActive(false);
+        if (sfxActive)
+        {
+            audioManager.PlayOneShot(menuButtonSFX, 1.5f);
+
+        }
+    }
+    public void ExitTutorialMenu(GameObject desiredMenu)
+    {
+        desiredMenu.SetActive(true);
+        tutorialMenu.SetActive(false);
+        if (sfxActive)
+        {
+            audioManager.PlayOneShot(menuButtonSFX, 1.5f);
+
+        }
+    }
+    public void ToggleBGM()
+    {
+        if (bgmActive)
+        {
+            audioManager.volume = 0;
+            bgmActive = false;
+            musicCheck.SetActive(false);
+        }
+        else
+        {
+            audioManager.volume = .3f;
+            bgmActive = true;
+            musicCheck.SetActive(true);
+
+        }
+    }
+
+    public void ToggleSFX()
+    {
+        if (sfxActive)
+        {
+            sfxActive = false;
+            sfxCheck.SetActive(false);
+
+        }
+        else
+        {
+            sfxActive = true;
+            sfxCheck.SetActive(true);
+
+        }
+    }
+
+    public void ResumeGame()
+    {
+        pauseMenu.SetActive(false);
+        paused = false;
+        Time.timeScale = 1;
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
+
     private Vector3 AssignHeldPosition(Tetromino held, Tetromino current)
     {
         Vector3 newPosition = new Vector3();
@@ -630,7 +1039,8 @@ public class GameManager : MonoBehaviour
             {
                 newPosition = current.transform.localPosition + new Vector3(0, -.5f, 0);
 
-            }else if(current.myType == Tetromino.Type.L || current.myType == Tetromino.Type.L1)
+            }
+            else if (current.myType == Tetromino.Type.L || current.myType == Tetromino.Type.L1)
             {
                 newPosition = current.transform.localPosition;
             }
@@ -715,9 +1125,9 @@ public class GameManager : MonoBehaviour
                 go.transform.localPosition = new Vector3(6, 5, 0);
 
 
-                
+
             }
-            go.transform.localScale = new Vector3(1.5f,1.5f, 1.5f);
+            go.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
             nextPiece = go.GetComponent<Tetromino>();
         }
         else
