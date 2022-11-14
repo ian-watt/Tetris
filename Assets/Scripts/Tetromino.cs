@@ -54,6 +54,7 @@ public class Tetromino : MonoBehaviour
         }
     }
 
+    //main rotation function that moves the piece based on checked clone values from Rotate()
     private void HandleRotation()
     {
         // L Rotation
@@ -142,6 +143,7 @@ public class Tetromino : MonoBehaviour
         }
     }
 
+    //clone current piece, rotate to the desired rotational value, and if it is valid pass that to HandleRotation()
     private void Rotate(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4, Rotation newRotation)
     {
         bool possible = true;
@@ -172,6 +174,7 @@ public class Tetromino : MonoBehaviour
         }
     }
 
+    //helper function to update the position of bodyParts during rotation
     private void UpdateParts(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4)
     {
         for (int i = 0; i < bodyParts.Count; i++)
@@ -196,6 +199,9 @@ public class Tetromino : MonoBehaviour
             }
         }
     }
+
+    //helper function to update the position of cloned bodyParts during rotation
+
     private void UpdateCloneParts(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4)
     {
 
@@ -221,6 +227,7 @@ public class Tetromino : MonoBehaviour
         }
     }
 
+    //basic helper functions to check for bounds during movement or rotation
     public bool IsWithinBoundsNeg()
     {
         bool x = true;
@@ -260,7 +267,6 @@ public class Tetromino : MonoBehaviour
         }
         return x;
     }
-
     public bool IsWithinBoundsPos()
     {
         bool x = true;
@@ -298,6 +304,7 @@ public class Tetromino : MonoBehaviour
         return x;
     }
 
+    //initialize cloned piece values based on current piece values
     SimulatedPiece Clone()
     {
         simulatedPiece = new SimulatedPiece();

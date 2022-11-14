@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class SimulatedPiece
 {
+    //tetromino clone used to manage rotational checks
+
     public Vector3 position;
     public bool isFalling = false;
     public List<BodyPart> bodyParts;

@@ -5,6 +5,9 @@ using UnityEngine.SceneManagement;
 
 public class TransitionManager : MonoBehaviour
 {
+
+    //simple transitional script to manage the transition scene
+
     private void Awake()
     {
         StartCoroutine(WaitToSwitchScene());

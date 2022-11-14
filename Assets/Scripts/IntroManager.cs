@@ -5,6 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class IntroManager : MonoBehaviour
 {
+    //simple intro script to help with fading in and out to main menu
+
     private void Awake()
     {
        StartCoroutine(WaitToSwitchScene());

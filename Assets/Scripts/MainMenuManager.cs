@@ -6,27 +6,28 @@ using UnityEngine.SceneManagement;
 
 public class MainMenuManager : MonoBehaviour
 {
+
+    private bool sfxActive = true;
+    private bool bgmActive = true;
     public GameObject mainMenu;
     public GameObject optionsMenu;
     public GameObject highScoreMenu;
-    public static MainMenuManager instance;
     public GameObject buttons;
     public GameObject logo;
-    public AudioClip menuButtonSFX;
-    public AudioSource audioManager;
     public GameObject musicCheck;
     public GameObject sfxCheck;
-    private bool sfxActive = true;
-    private bool bgmActive = true;
+
+    public static MainMenuManager instance;
+
+    public AudioClip menuButtonSFX;
+    public AudioSource audioManager;
     public Animator fadeController;
     public Canvas fadeObject;
-
     public TextMeshProUGUI score1;
     public TextMeshProUGUI score2;
     public TextMeshProUGUI score3;
     public TextMeshProUGUI score4;
     public TextMeshProUGUI score5;
-    public int devScore = 123600;
 
     private void Awake()
     {
@@ -87,12 +88,6 @@ public class MainMenuManager : MonoBehaviour
         buttons.SetActive(true);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
     public void SwitchScene(int index)
     {
         StartCoroutine(FadeOutAndSwitch(index));
@@ -109,6 +104,9 @@ public class MainMenuManager : MonoBehaviour
         SceneManager.LoadScene(index);
         
     }
+
+
+    // <---------- MENU HANDLING ---------->
 
     public void OpenOptionsMenu(GameObject desiredMenu)
     {
@@ -199,5 +197,29 @@ public class MainMenuManager : MonoBehaviour
 
         }
     }
+
+    public void OpenTutorialMenu(GameObject desiredMenu)
+    {
+
+        desiredMenu.SetActive(true);
+        mainMenu.SetActive(false);
+        if (sfxActive)
+        {
+            audioManager.PlayOneShot(menuButtonSFX, 1.5f);
+
+        }
+    }
+    public void ExitTutorialMenu(GameObject desiredMenu)
+    {
+        desiredMenu.SetActive(false);
+        mainMenu.SetActive(true);
+        if (sfxActive)
+        {
+            audioManager.PlayOneShot(menuButtonSFX, 1.5f);
+
+        }
+    }
+
+    // <---------- END OF MENU HANDLING ---------->
 
 }

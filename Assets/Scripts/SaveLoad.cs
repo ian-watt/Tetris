@@ -6,7 +6,20 @@ using UnityEngine;
 public class SaveLoad : MonoBehaviour
 {
 
+    // fields to store top 5 high scores and respective names 
+    public string name1 = "Rimbiy";
+    public string name2;
+    public string name3;
+    public string name4;
+    public string name5;
+    public int score1 = 1362700;
+    public int score2;
+    public int score3;
+    public int score4;
+    public int score5;
     public static SaveLoad Instance;
+
+    //assign instance to this
     private void Awake()
     {
         if (Instance != null)
@@ -20,18 +33,8 @@ public class SaveLoad : MonoBehaviour
 
 
     }
-    public string name1 = "Rimbiy";
-    public string name2;
-    public string name3;
-    public string name4;
-    public string name5;
-    public int score1 = 1362700;
-    public int score2;
-    public int score3;
-    public int score4;
-    public int score5;
 
-
+    //save data class with top 5 scores and names for saving
     [System.Serializable]
     class SaveData
     {
@@ -47,6 +50,7 @@ public class SaveLoad : MonoBehaviour
         public int score5;
     }
 
+    //save highscores based on the current attempts score
     public void SaveScore()
     {
         SaveData data = new SaveData();
@@ -122,7 +126,7 @@ public class SaveLoad : MonoBehaviour
         File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
     }
 
-    [ContextMenu("Load")]
+    //initialize instance fields to the saved values
     public void LoadScore()
     {
         string path = Application.persistentDataPath + "/savefile.json";
