@@ -236,7 +236,7 @@ GameObject:
   - component: {fileID: 946846208}
   - component: {fileID: 946846207}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: Credit Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -388,11 +388,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4233106356e90a04c9cdf4125abdd3d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  highScoreNames: []
-  attemptScore: 0
-  highScores: 
-  attemptName: 
-  isNameSet: 0
+  name1: Rimbiy
+  name2: 
+  name3: 
+  name4: 
+  name5: 
+  score1: 1362700
+  score2: 0
+  score3: 0
+  score4: 0
+  score5: 0
 --- !u!4 &1493956022
 Transform:
   m_ObjectHideFlags: 0

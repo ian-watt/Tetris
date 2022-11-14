@@ -141,7 +141,7 @@ GameObject:
   - component: {fileID: 103619736}
   - component: {fileID: 103619735}
   m_Layer: 5
-  m_Name: InputField (TMP)
+  m_Name: Submit Input Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -317,7 +317,7 @@ GameObject:
   - component: {fileID: 191735625}
   - component: {fileID: 191735624}
   m_Layer: 5
-  m_Name: Panel
+  m_Name: Fade
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -413,7 +413,7 @@ GameObject:
   - component: {fileID: 201814620}
   - component: {fileID: 201814619}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: Submit Score?
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2292,7 +2292,7 @@ GameObject:
   - component: {fileID: 881559020}
   - component: {fileID: 881559019}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: Game Over Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2661,7 +2661,7 @@ GameObject:
   - component: {fileID: 1091841991}
   - component: {fileID: 1091841990}
   m_Layer: 5
-  m_Name: Button
+  m_Name: Submit Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3329,7 +3329,7 @@ GameObject:
   - component: {fileID: 1255885065}
   - component: {fileID: 1255885064}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: Next Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3841,7 +3841,7 @@ GameObject:
   - component: {fileID: 1351641062}
   - component: {fileID: 1351641061}
   m_Layer: 5
-  m_Name: Button
+  m_Name: Quit Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5026,7 +5026,7 @@ GameObject:
   - component: {fileID: 1893776218}
   - component: {fileID: 1893776217}
   m_Layer: 5
-  m_Name: RawImage
+  m_Name: Background
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5322,6 +5322,18 @@ PrefabInstance:
     - target: {fileID: 2339638865766402901, guid: ab0163dbe4d92b340960ece77050bc31, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2339638866549980743, guid: ab0163dbe4d92b340960ece77050bc31, type: 3}
+      propertyPath: m_Name
+      value: Background
+      objectReference: {fileID: 0}
+    - target: {fileID: 2339638867375263838, guid: ab0163dbe4d92b340960ece77050bc31, type: 3}
+      propertyPath: m_Name
+      value: Tutorial Text
+      objectReference: {fileID: 0}
+    - target: {fileID: 2339638867520404076, guid: ab0163dbe4d92b340960ece77050bc31, type: 3}
+      propertyPath: m_Name
+      value: Back Button
       objectReference: {fileID: 0}
     - target: {fileID: 2339638867520404078, guid: ab0163dbe4d92b340960ece77050bc31, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target

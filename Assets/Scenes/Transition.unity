@@ -530,7 +530,7 @@ GameObject:
   - component: {fileID: 817126318}
   - component: {fileID: 817126317}
   m_Layer: 5
-  m_Name: RawImage
+  m_Name: Video
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -637,7 +637,7 @@ GameObject:
   - component: {fileID: 873194017}
   - component: {fileID: 873194016}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: Video
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -135,7 +135,7 @@ GameObject:
   - component: {fileID: 15857955}
   - component: {fileID: 15857954}
   m_Layer: 5
-  m_Name: Play
+  m_Name: Tutorial
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -405,7 +405,7 @@ GameObject:
   - component: {fileID: 114221674}
   - component: {fileID: 114221673}
   m_Layer: 5
-  m_Name: Background
+  m_Name: Background Video
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -587,6 +587,22 @@ PrefabInstance:
     - target: {fileID: 2339638865766402901, guid: ab0163dbe4d92b340960ece77050bc31, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2339638866340531764, guid: ab0163dbe4d92b340960ece77050bc31, type: 3}
+      propertyPath: m_Name
+      value: Back
+      objectReference: {fileID: 0}
+    - target: {fileID: 2339638866549980743, guid: ab0163dbe4d92b340960ece77050bc31, type: 3}
+      propertyPath: m_Name
+      value: Background
+      objectReference: {fileID: 0}
+    - target: {fileID: 2339638867375263838, guid: ab0163dbe4d92b340960ece77050bc31, type: 3}
+      propertyPath: m_Name
+      value: Tutorial Text
+      objectReference: {fileID: 0}
+    - target: {fileID: 2339638867520404076, guid: ab0163dbe4d92b340960ece77050bc31, type: 3}
+      propertyPath: m_Name
+      value: Back Button
       objectReference: {fileID: 0}
     - target: {fileID: 2339638867520404078, guid: ab0163dbe4d92b340960ece77050bc31, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -1351,7 +1367,7 @@ GameObject:
   m_Component:
   - component: {fileID: 804410627}
   m_Layer: 5
-  m_Name: buttons
+  m_Name: Main Menu Buttons
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1394,7 +1410,7 @@ GameObject:
   - component: {fileID: 847277076}
   - component: {fileID: 847277075}
   m_Layer: 5
-  m_Name: Image
+  m_Name: Logo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2510,7 +2526,7 @@ GameObject:
   - component: {fileID: 1314434398}
   - component: {fileID: 1314434397}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: Rimbiy Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3668,7 +3684,7 @@ GameObject:
   - component: {fileID: 2098907821}
   - component: {fileID: 2098907820}
   m_Layer: 5
-  m_Name: Panel
+  m_Name: Background Video
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
